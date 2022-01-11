@@ -17,6 +17,7 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import org.json.JSONObject
 import kotlin.math.absoluteValue
+import com.google.gson.Gson
 
 class Gt3FlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     private lateinit var channel: MethodChannel
@@ -149,11 +150,16 @@ class Gt3FlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 }
 
                 override fun onDialogResult(result: String?) {
+                    var resultMap :Map<String, Any> = HashMap()
+                    resultMap = Gson().fromJson(result, resultMap.javaClass)
+                    channel.invokeMethod("onResult",
+                        hashMapOf<String, Any>("code" to "1", "result" to resultMap))
                     gt3GeetestUtils.showSuccessDialog()
                 }
 
                 override fun onReceiveCaptchaCode(p0: Int) {
-                    channel.invokeMethod("onResult", hashMapOf("code" to "$p0"))
+                    if (p0 == 0)
+                        channel.invokeMethod("onResult", hashMapOf<String, Any>("code" to "$p0"))
                 }
 
                 override fun onStatistics(p0: String?) {}
